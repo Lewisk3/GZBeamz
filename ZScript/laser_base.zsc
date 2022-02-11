@@ -129,8 +129,6 @@ class LaserBeam : Actor
 		double dirPitch = pitch - 90;
 		vector3 dir = BeamzMath.GetAxes(angle, pitch - 90, roll);
 		scale.y = (dist * 0.32);
-		
-		// SetOrigin(level.vec3offset(pos, dir), true);
 	}
 	
 	States

@@ -14,7 +14,7 @@ class BeamzMath Abstract
 	}
 }
 
-
+// Matrix library from Gutamatics (https://gitlab.com/Gutawer/gzdoom-gutamatics/-/blob/master/Gutamatics/Matrix.zsc)
 enum BeamzVectorType {
 	BeamzVector_Position,
 	BeamzVector_Direction
