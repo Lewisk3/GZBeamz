@@ -1,9 +1,9 @@
 
 class LaserBeam : Actor
-{	
-	const MAXDIST = 2048;
+{
 	Color shade;
 
+	double maxDist;
 	int ontics;
 	bool enabled;
 	Actor source;
@@ -28,12 +28,13 @@ class LaserBeam : Actor
 		LaserBeam.TrackAngles true;
 	}
 	
-	static LaserBeam Create(Actor source, double fw, double lr, double ud, class<LaserBeam> type = "LaserBeam")
+	static LaserBeam Create(Actor source, double fw, double lr, double ud, double maxDist = 2048, class<LaserBeam> type = "LaserBeam")
 	{
 		let laser = LaserBeam(Spawn(type, source.pos));
 		if(laser) 
 		{
 			laser.source = source;
+			laser.maxDist = maxDist;
 			laser.offsets = (fw, lr, ud);
 		}
 		
@@ -130,7 +131,7 @@ class LaserBeam : Actor
 		double zoffs = source.player ? (source.player.viewz-source.pos.z) : source.height * 0.5;
 		source.LineTrace(angle, MAXDIST, pitch - 90, 0, zoffs+offsets.z, offsets.x, offsets.y, data:hitData);
 		
-		double dist = hitData.Distance;
+		double dist = min(hitData.Distance, maxDist);
 		double dirPitch = pitch - 90;
 		vector3 dir = BeamzMath.GetAxes(angle, pitch - 90, roll);
 		scale.y = (dist * 0.32);
