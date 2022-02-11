@@ -8,6 +8,7 @@ class LaserBeam : Actor
 	bool enabled;
 	Actor source;
 	vector3 offsets;
+	transient FLineTraceData hitData;
 	
 	bool trackingPos;
 	vector3 targetPos;
@@ -68,6 +69,11 @@ class LaserBeam : Actor
 		return srcPos;
 	}
 	
+	virtual void BeamTick()
+	{
+		// Implement custom laser logic here.
+	}
+	
 	override void Tick()
 	{
 		if(isFrozen()) return;
@@ -121,14 +127,15 @@ class LaserBeam : Actor
 		}
 		
 		// Do linetrace to determine out aim distance.
-		FLineTraceData lt;
 		double zoffs = source.player ? (source.player.viewz-source.pos.z) : source.height * 0.5;
-		source.LineTrace(angle, MAXDIST, pitch - 90, 0, zoffs+offsets.z, offsets.x, offsets.y, data:lt);
+		source.LineTrace(angle, MAXDIST, pitch - 90, 0, zoffs+offsets.z, offsets.x, offsets.y, data:hitData);
 		
-		double dist = lt.Distance;
+		double dist = hitData.Distance;
 		double dirPitch = pitch - 90;
 		vector3 dir = BeamzMath.GetAxes(angle, pitch - 90, roll);
 		scale.y = (dist * 0.32);
+		
+		BeamTick();
 	}
 	
 	States
