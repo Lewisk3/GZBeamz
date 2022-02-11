@@ -86,7 +86,7 @@ class LaserBeam : Actor
 		}
 		ontics++;
 		bInvisible = ontics < 3;
-		SetShade(shade);
+		if(shade) SetShade(shade);
 				
 		// Update laser and tracking.
 		vector3 offsPos = BeamzMath.offsetToGlobal(
@@ -101,7 +101,7 @@ class LaserBeam : Actor
 			vector3 diff = level.vec3diff(finalPos, targetPos);
 			vector3 dir = diff.Unit();
 			
-			scale.y = diff.Length() * 0.32;
+			scale.y = diff.Length() * level.pixelstretch;
 			
 			double toAngle = atan2(dir.y, dir.x) + 180; 
 			double toPitch = asin(dir.z);
