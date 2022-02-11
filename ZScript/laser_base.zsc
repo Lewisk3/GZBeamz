@@ -105,7 +105,8 @@ class LaserBeam : Actor
 			let psp = source.player.GetPSprite(trackPSLayer);
 			bob = PlayerPawn(source).BobWeapon(1.0);
 			
-			bob *= 0.035;
+			bob.x *= 0.031;
+			bob.y *= 0.035;
 			bob.x += psp.x;
 			bob.y += (psp.y - 32);
 		}
