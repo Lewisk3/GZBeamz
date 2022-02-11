@@ -8,13 +8,20 @@ class LaserBeam : Actor
 	bool enabled;
 	Actor source;
 	vector3 offsets;
+	vector2 angleOffsets;
 	transient FLineTraceData hitData;
 	
 	bool trackingPos;
 	vector3 targetPos;
 	
+	bool aimWithWeapon;
+	bool trackPSprite;
+	uint trackPSLayer;
+	
 	bool followAngles;
 	Property TrackAngles : followAngles;
+	Property TrackWeapon : trackPSprite, trackPSLayer;
+	Property AimFromWeapon : aimWithWeapon; 
 	Property LaserColor : shade;
 	
 	Default
@@ -25,10 +32,12 @@ class LaserBeam : Actor
 		RenderStyle "AddShaded";
 		
 		LaserBeam.LaserColor "Blue";
-		LaserBeam.TrackAngles true;
+		LaserBeam.TrackAngles true;				// Update with player's view.
+		LaserBeam.TrackWeapon true, PSP_WEAPON; // Offset by PSprite offsets.
+		LaserBeam.AimFromWeapon true;			// Fire from weapon "muzzle", only used if TrackWeapon is enabled.
 	}
 	
-	static LaserBeam Create(Actor source, double fw, double lr, double ud, double maxDist = 2048, class<LaserBeam> type = "LaserBeam")
+	static LaserBeam Create(Actor source, double fw, double lr, double ud, double angleOffs = 0, double pitchOffs = 0, double maxDist = 2048, class<LaserBeam> type = "LaserBeam")
 	{
 		let laser = LaserBeam(Spawn(type, source.pos));
 		if(laser) 
@@ -36,6 +45,7 @@ class LaserBeam : Actor
 			laser.source = source;
 			laser.maxDist = maxDist;
 			laser.offsets = (fw, lr, ud);
+			laser.angleOffsets = (angleOffs, pitchOffs);
 		}
 		
 		return laser;
@@ -88,10 +98,22 @@ class LaserBeam : Actor
 		bInvisible = ontics < 3;
 		if(shade) SetShade(shade);
 				
+		// PSprite tracking?
+		vector2 bob = (0,0);
+		if(trackPSprite)
+		{
+			let psp = source.player.GetPSprite(trackPSLayer);
+			bob = PlayerPawn(source).BobWeapon(1.0);
+			
+			bob *= 0.035;
+			bob.x += psp.x;
+			bob.y += (psp.y - 32);
+		}
+		
 		// Update laser and tracking.
 		vector3 offsPos = BeamzMath.offsetToGlobal(
 			source.angle, source.pitch, source.roll,
-			offsets.x, offsets.y, offsets.z
+			offsets.x, offsets.y + bob.x, offsets.z - bob.y
 		);
 		vector3 finalPos = level.vec3offset(getSourcePos(), offsPos);
 		SetOrigin(finalPos, true);
@@ -110,6 +132,14 @@ class LaserBeam : Actor
 			return;
 		}
 		
+		double toAngle = source.angle + angleOffsets.x;
+		double toPitch = source.pitch + angleOffsets.y;
+		if(aimWithWeapon) 
+		{
+			toAngle -= (bob.x * 10);
+			toPitch += (bob.y * 10);  
+		}		
+		
 		// Update angles
 		if(followAngles)
 		{
@@ -118,8 +148,8 @@ class LaserBeam : Actor
 			// (https://github.com/jekyllgrim/Painslayer/blob/master/ZPainkiller/klazer/KLAZ_Beam.zsc#L114)
 				
 			// First, track angles like normal.
-			A_SetAngle(source.angle, SPF_INTERPOLATE);
-			A_SetPitch(source.pitch+90, SPF_INTERPOLATE);
+			A_SetAngle(toAngle, SPF_INTERPOLATE);
+			A_SetPitch(toPitch+90, SPF_INTERPOLATE);
 		
 			// Odd interpolation magic.
 			double prevAngle = source.angle;
@@ -129,7 +159,7 @@ class LaserBeam : Actor
 		
 		// Do linetrace to determine out aim distance.
 		double zoffs = source.player ? (source.player.viewz-source.pos.z) : source.height * 0.5;
-		source.LineTrace(angle, MAXDIST, pitch - 90, 0, zoffs+offsets.z, offsets.x, offsets.y, data:hitData);
+		source.LineTrace(angle, maxDist, pitch - 90, 0, zoffs+offsets.z-bob.y, offsets.x, offsets.y-bob.x, data:hitData);
 		
 		double dist = min(hitData.Distance, maxDist);
 		double dirPitch = pitch - 90;

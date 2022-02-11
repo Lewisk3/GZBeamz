@@ -3,6 +3,19 @@
  #include "ZScript/laser_math.zsc"
  #include "ZScript/laser_base.zsc"
  
+ class PulseLaser : LaserBeam
+ {
+	Default
+	{
+		LaserBeam.LaserColor "Red";
+	}
+	
+	override void BeamTick()
+	{
+		// alpha = sin(GetAge() * 60) + 0.5;
+	}
+ }
+ 
  
  class TestBeam : Inventory
  {
@@ -13,29 +26,29 @@
 		uint btns = Owner.player.cmd.buttons;
 		uint obtns = Owner.player.oldbuttons;
 	
+		// Create Laser
 		if(!beam) 
 		{
-			beam = beam.Create(Owner, 0, 2, -2);
+			beam = beam.Create(Owner, 5, 0, -2, 0, 2, type:"PulseLaser");
 			beam.SetEnabled(true);
 		}
 		
+		// Toggle laser
 		if( btns & BT_RELOAD && !(obtns & BT_RELOAD) ) 
 			beam.SetEnabled(!beam.enabled);
 		
-		if( btns & BT_ALTATTACK && !(obtns & BT_ALTATTACK) )
+		// Update laser if tracking target
+		if(beam.isTracking())
 		{
-			if(beam.isTracking())
-			{
-				beam.stopTracking();
-				return;
-			}
-			
 			Actor aim = Owner.AimTarget();
-			if(aim)
-			{				
-				console.printf("Got: %s", aim.GetClassname());
-				beam.startTracking( (aim.pos.xy, aim.pos.z + aim.height * 0.5) );
-			}
+			if(aim) beam.targetPos = (aim.pos.xy, aim.pos.z + aim.height * 0.5);
 		}
+		
+		// Toggle tracking
+		if( btns & BT_ALTATTACK && !(obtns & BT_ALTATTACK) )
+			beam.trackingPos = !beam.trackingPos;
 	}
  }
+ 
+ 
+ 
