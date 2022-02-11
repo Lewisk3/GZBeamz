@@ -1,0 +1,8 @@
+Model "LaserBeam"
+{
+	Model 0 "Models/beam.md3"
+	Skin 0 "Graphics/beam.png"
+	USEACTORPITCH
+	
+	FrameIndex MODL A 0 0
+}

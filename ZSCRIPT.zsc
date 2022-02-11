@@ -1,0 +1,41 @@
+ version "4.5"
+ 
+ #include "ZScript/laser_math.zsc"
+ #include "ZScript/laser_base.zsc"
+ 
+ 
+ class TestBeam : Inventory
+ {
+	LaserBeam beam;
+	
+	override void DoEffect()
+	{
+		uint btns = Owner.player.cmd.buttons;
+		uint obtns = Owner.player.oldbuttons;
+	
+		if(!beam) 
+		{
+			beam = beam.Create(Owner, 0, 2, -2);
+			beam.SetEnabled(true);
+		}
+		
+		if( btns & BT_RELOAD && !(obtns & BT_RELOAD) ) 
+			beam.SetEnabled(!beam.enabled);
+		
+		if( btns & BT_ALTATTACK && !(obtns & BT_ALTATTACK) )
+		{
+			if(beam.isTracking())
+			{
+				beam.stopTracking();
+				return;
+			}
+			
+			Actor aim = Owner.AimTarget();
+			if(aim)
+			{				
+				console.printf("Got: %s", aim.GetClassname());
+				beam.startTracking( (aim.pos.xy, aim.pos.z + aim.height * 0.5) );
+			}
+		}
+	}
+ }
