@@ -1,5 +1,5 @@
 
-class BeamzMath Abstract
+class BEAMZ_BeamzMath Abstract
 {
 	static vector3 getAxes(double angle, double pitch, double roll)
 	{
@@ -8,25 +8,25 @@ class BeamzMath Abstract
 	
 	static vector3 offsetToGlobal(double angle, double pitch, double roll, double forward, double leftright, double updown)
 	{
-		let mat = BeamzMatrix.fromEulerAngles(angle, pitch, roll);
+		let mat = BEAMZ_BeamzMatrix.fromEulerAngles(angle, pitch, roll);
 		mat = mat.multiplyVector3((forward, -leftright, updown));
 		return mat.asVector3(false);
 	}
 }
 
 // Matrix library from Gutamatics (https://gitlab.com/Gutawer/gzdoom-gutamatics/-/blob/master/Gutamatics/Matrix.zsc)
-enum BeamzVectorType {
+enum BEAMZ_BeamzVectorType {
 	BeamzVector_Position,
 	BeamzVector_Direction
 }
 
-class BeamzMatrix {
+class BEAMZ_BeamzMatrix {
 	private Array<double> values;
 	private int columns;
 	private int rows;
 
 	/// Initialises a new Matrix.
-	BeamzMatrix init(int columns, int rows) {
+	BEAMZ_BeamzMatrix init(int columns, int rows) {
 		if (columns <= 0 || rows <= 0) {
 			throwAbortException("Error: <%p>.init(%d, %d) - Matrix needs to be at least 1 * 1", self, columns, rows);
 		}
@@ -42,13 +42,13 @@ class BeamzMatrix {
 	}
 
 	/// Initialises a new Matrix in a static context.
-	static BeamzMatrix create(int columns, int rows) {
-		return new("BeamzMatrix").init(columns, rows);
+	static BEAMZ_BeamzMatrix create(int columns, int rows) {
+		return new("BEAMZ_BeamzMatrix").init(columns, rows);
 	}
 
 	/// Returns an identity matrix.
-	static BeamzMatrix identity(int dimension) {
-		BeamzMatrix ret = BeamzMatrix.create(dimension, dimension);
+	static BEAMZ_BeamzMatrix identity(int dimension) {
+		BEAMZ_BeamzMatrix ret = BEAMZ_BeamzMatrix.create(dimension, dimension);
 		for (int i = 0; i < dimension; i++) {
 			ret.set(i, i, 1);
 		}
@@ -56,8 +56,8 @@ class BeamzMatrix {
 	}
 
 	/// Returns a rotation matrix from euler angles.
-	static BeamzMatrix fromEulerAngles(double yaw, double pitch, double roll) {
-		BeamzMatrix rYaw = BeamzMatrix.identity(4);
+	static BEAMZ_BeamzMatrix fromEulerAngles(double yaw, double pitch, double roll) {
+		BEAMZ_BeamzMatrix rYaw = BEAMZ_BeamzMatrix.identity(4);
 		double sYaw = sin(yaw);
 		double cYaw = cos(yaw);
 		rYaw.set(0, 0,  cYaw);
@@ -65,7 +65,7 @@ class BeamzMatrix {
 		rYaw.set(1, 0,  sYaw);
 		rYaw.set(1, 1,  cYaw);
 
-		BeamzMatrix rPitch = BeamzMatrix.identity(4);
+		BEAMZ_BeamzMatrix rPitch = BEAMZ_BeamzMatrix.identity(4);
 		double sPitch = sin(pitch);
 		double cPitch = cos(pitch);
 		rPitch.set(0, 0,  cPitch);
@@ -73,7 +73,7 @@ class BeamzMatrix {
 		rPitch.set(0, 2,  sPitch);
 		rPitch.set(2, 2,  cPitch);
 
-		BeamzMatrix rRoll = BeamzMatrix.identity(4);
+		BEAMZ_BeamzMatrix rRoll = BEAMZ_BeamzMatrix.identity(4);
 		double sRoll = sin(roll);
 		double cRoll = cos(roll);
 		rRoll.set(1, 1,  cRoll);
@@ -82,14 +82,14 @@ class BeamzMatrix {
 		rRoll.set(2, 2,  cRoll);
 
 		// concatenate ypr to get the final matrix
-		BeamzMatrix ret = rYaw.multiplyMatrix(rPitch);
+		BEAMZ_BeamzMatrix ret = rYaw.multiplyMatrix(rPitch);
 		ret = ret.multiplyMatrix(rRoll);
 		return ret;
 	}
 
 	/// Returns a rotation matrix from an axis and an angle.
-	static BeamzMatrix fromAxisAngle(Vector3 axis, double angle) {
-		BeamzMatrix ret = BeamzMatrix.identity(4);
+	static BEAMZ_BeamzMatrix fromAxisAngle(Vector3 axis, double angle) {
+		BEAMZ_BeamzMatrix ret = BEAMZ_BeamzMatrix.identity(4);
 		double c = cos(angle);
 		double s = sin(angle);
 		double x = axis.x;
@@ -109,38 +109,38 @@ class BeamzMatrix {
 		return ret;
 	}
 	
-	static BeamzMatrix createTRSEuler(Vector3 translate, double yaw, double pitch, double roll, Vector3 scale) {
-		BeamzMatrix translateMat = BeamzMatrix.identity(4);
+	static BEAMZ_BeamzMatrix createTRSEuler(Vector3 translate, double yaw, double pitch, double roll, Vector3 scale) {
+		BEAMZ_BeamzMatrix translateMat = BEAMZ_BeamzMatrix.identity(4);
 		translateMat.set(0, 3, translate.x);
 		translateMat.set(1, 3, translate.y);
 		translateMat.set(2, 3, translate.z);
 		
-		BeamzMatrix rotateMat = BeamzMatrix.fromEulerAngles(yaw, pitch, roll);
+		BEAMZ_BeamzMatrix rotateMat = BEAMZ_BeamzMatrix.fromEulerAngles(yaw, pitch, roll);
 		
-		BeamzMatrix scaleMat = BeamzMatrix.identity(4);
+		BEAMZ_BeamzMatrix scaleMat = BEAMZ_BeamzMatrix.identity(4);
 		scaleMat.set(0, 0, scale.x);
 		scaleMat.set(1, 1, scale.y);
 		scaleMat.set(2, 2, scale.z);
 		
-		BeamzMatrix ret = translateMat.multiplyMatrix(rotateMat);
+		BEAMZ_BeamzMatrix ret = translateMat.multiplyMatrix(rotateMat);
 		ret = ret.multiplyMatrix(scaleMat);
 		return ret;
 	}
 	
-	static BeamzMatrix createTRSAxisAngle(Vector3 translate, Vector3 axis, double angle, Vector3 scale) {
-		BeamzMatrix translateMat = BeamzMatrix.identity(4);
+	static BEAMZ_BeamzMatrix createTRSAxisAngle(Vector3 translate, Vector3 axis, double angle, Vector3 scale) {
+		BEAMZ_BeamzMatrix translateMat = BEAMZ_BeamzMatrix.identity(4);
 		translateMat.set(0, 3, translate.x);
 		translateMat.set(1, 3, translate.y);
 		translateMat.set(2, 3, translate.z);
 		
-		BeamzMatrix rotateMat = BeamzMatrix.fromAxisAngle(axis, angle);
+		BEAMZ_BeamzMatrix rotateMat = BEAMZ_BeamzMatrix.fromAxisAngle(axis, angle);
 		
-		BeamzMatrix scaleMat = BeamzMatrix.identity(4);
+		BEAMZ_BeamzMatrix scaleMat = BEAMZ_BeamzMatrix.identity(4);
 		scaleMat.set(0, 0, scale.x);
 		scaleMat.set(1, 1, scale.y);
 		scaleMat.set(2, 2, scale.z);
 		
-		BeamzMatrix ret = translateMat.multiplyMatrix(rotateMat);
+		BEAMZ_BeamzMatrix ret = translateMat.multiplyMatrix(rotateMat);
 		ret = ret.multiplyMatrix(scaleMat);
 		return ret;
 	}
@@ -156,11 +156,11 @@ class BeamzMatrix {
 	}
 
 	/// Adds two matrices and returns the result.
-	BeamzMatrix addMatrix(BeamzMatrix other) const {
+	BEAMZ_BeamzMatrix addMatrix(BEAMZ_BeamzMatrix other) const {
 		if (rows != other.rows || columns != other.columns) {
 			throwAbortException("Error: <%p>.addMatrix(<%p>) - Matrices need to be equal size", self, other);
 		}
-		BeamzMatrix ret = BeamzMatrix.create(columns, rows);
+		BEAMZ_BeamzMatrix ret = BEAMZ_BeamzMatrix.create(columns, rows);
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < columns; col++) {
 				ret.set(row, col, get(row, col) + other.get(row, col));
@@ -170,8 +170,8 @@ class BeamzMatrix {
 	}
 
 	/// Multiplies the matrix by a scalar and returns the result.
-	BeamzMatrix multiplyScalar(double scalar) const {
-		BeamzMatrix ret = BeamzMatrix.create(rows, columns);
+	BEAMZ_BeamzMatrix multiplyScalar(double scalar) const {
+		BEAMZ_BeamzMatrix ret = BEAMZ_BeamzMatrix.create(rows, columns);
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < columns; col++) {
 				ret.set(row, col, get(row, col) * scalar);
@@ -181,11 +181,11 @@ class BeamzMatrix {
 	}
 
 	/// Multiplies two matrices and returns the result.
-	BeamzMatrix multiplyMatrix(BeamzMatrix other) const {
+	BEAMZ_BeamzMatrix multiplyMatrix(BEAMZ_BeamzMatrix other) const {
 		if (columns != other.rows) {
 			throwAbortException("Error: <%p>.multiplyMatrix(<%p>) - Matrix A columns needs to equal Matrix B rows", self, other);
 		}
-		BeamzMatrix ret = BeamzMatrix.create(other.columns, rows);
+		BEAMZ_BeamzMatrix ret = BEAMZ_BeamzMatrix.create(other.columns, rows);
 		for (int row = 0; row < ret.rows; row++) {
 			for (int col = 0; col < ret.columns; col++) {
 				double val = 0;
@@ -199,8 +199,8 @@ class BeamzMatrix {
 	}
 
 	/// Multiplies this Matrix by a 2D vector.
-	BeamzMatrix multiplyVector2(Vector2 vec, BeamzVectorType type = BeamzVector_Position) const {
-		BeamzMatrix vec2Matrix = BeamzMatrix.create(1, 3);
+	BEAMZ_BeamzMatrix multiplyVector2(Vector2 vec, BEAMZ_BeamzVectorType type = BeamzVector_Position) const {
+		BEAMZ_BeamzMatrix vec2Matrix = BEAMZ_BeamzMatrix.create(1, 3);
 		vec2Matrix.set(0, 0, vec.x);
 		vec2Matrix.set(1, 0, vec.y);
 		if (type == BeamzVector_Position)       vec2Matrix.set(2, 0, 1);
@@ -210,8 +210,8 @@ class BeamzMatrix {
 	}
 
 	/// Multiplies this Matrix by a 3D vector.
-	BeamzMatrix multiplyVector3(Vector3 vec, BeamzVectorType type = BeamzVector_Position) const {
-		BeamzMatrix vec3Matrix = BeamzMatrix.create(1, 4);
+	BEAMZ_BeamzMatrix multiplyVector3(Vector3 vec, BEAMZ_BeamzVectorType type = BeamzVector_Position) const {
+		BEAMZ_BeamzMatrix vec3Matrix = BEAMZ_BeamzMatrix.create(1, 4);
 		vec3Matrix.set(0, 0, vec.x);
 		vec3Matrix.set(1, 0, vec.y);
 		vec3Matrix.set(2, 0, vec.z);

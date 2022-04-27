@@ -1,16 +1,20 @@
-Model "LaserBeam"
+Model "BEAMZ_LaserBeam"
 {
-	Model 0 "Models/beam.md3"
-	Skin 0 "Graphics/beam.png"
+	Path "models/"
+	Model 0 "beam.md3"
+	Skin 0 "beam.png"
 	USEACTORPITCH
+	DONTCULLBACKFACES
 	
 	FrameIndex MODL A 0 0
 }
 Model "PulseLaser"
 {
-	Model 0 "Models/beam_cyl.md3"
-	Skin 0 "Graphics/beam_cyl.png"
+	Path "models/"
+	Model 0 "beam_cyl.md3"
+	Skin 0 "beam_cyl.png"
 	USEACTORPITCH
+	DONTCULLBACKFACES
 	
 	FrameIndex MODL A 0 0
 }

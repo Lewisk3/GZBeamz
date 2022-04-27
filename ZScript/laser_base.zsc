@@ -1,4 +1,4 @@
-class LaserBeam : Actor
+class BEAMZ_LaserBeam : Actor
 {
 	Color shade;
 
@@ -32,15 +32,15 @@ class LaserBeam : Actor
 		+INTERPOLATEANGLES;
 		RenderStyle "AddShaded";
 		
-		LaserBeam.LaserColor "Blue";
-		LaserBeam.TrackAngles true;				// Update with player's view.
-		LaserBeam.TrackWeapon true, PSP_WEAPON; // Offset by PSprite offsets.
-		LaserBeam.AimFromWeapon true;			// Fire from weapon "muzzle", only used if TrackWeapon is enabled.
+		BEAMZ_LaserBeam.LaserColor "Blue";
+		BEAMZ_LaserBeam.TrackAngles true;				// Update with player's view.
+		BEAMZ_LaserBeam.TrackWeapon true, PSP_WEAPON; // Offset by PSprite offsets.
+		BEAMZ_LaserBeam.AimFromWeapon true;			// Fire from weapon "muzzle", only used if TrackWeapon is enabled.
 	}
 	
-	static LaserBeam Create(Actor source, double fw, double lr, double ud, double angleOffs = 0, double pitchOffs = 0, double maxDist = 2048, class<LaserBeam> type = "LaserBeam")
+	static BEAMZ_LaserBeam Create(Actor source, double fw, double lr, double ud, double angleOffs = 0, double pitchOffs = 0, double maxDist = 2048, class<BEAMZ_LaserBeam> type = "BEAMZ_LaserBeam")
 	{
-		let laser = LaserBeam(Spawn(type, source.pos));
+		let laser = BEAMZ_LaserBeam(Spawn(type, source.pos));
 		if(laser) 
 		{
 			laser.source = source;
@@ -139,7 +139,7 @@ class LaserBeam : Actor
 		}
 		
 		// Update laser and tracking.
-		curOffs = BeamzMath.offsetToGlobal(
+		curOffs = BEAMZ_BeamzMath.offsetToGlobal(
 			source.angle, source.pitch, source.roll,
 			offsets.x, offsets.y + bob.x, offsets.z - bob.y
 		);

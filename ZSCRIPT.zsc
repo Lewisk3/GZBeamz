@@ -3,16 +3,16 @@
  #include "ZScript/laser_math.zsc"
  #include "ZScript/laser_base.zsc"
  
- class PulseLaser : LaserBeam
+ class PulseLaser : BEAMZ_LaserBeam
  {
 	Default
 	{
-		LaserBeam.LaserColor "Red";
+		BEAMZ_LaserBeam.LaserColor "Red";
 	}
 	
 	override void BeamTick()
 	{
-		// alpha = sin(GetAge() * 60) + 0.5;
+		alpha = sin(GetAge() * 60) + 0.5;
 		aimAtCrosshair();
 	}
  }
@@ -20,7 +20,7 @@
  
  class TestBeam : Inventory
  {
-	LaserBeam beam;
+	BEAMZ_LaserBeam beam;
 	
 	override void DoEffect()
 	{
