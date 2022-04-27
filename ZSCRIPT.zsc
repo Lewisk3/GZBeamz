@@ -13,6 +13,7 @@
 	override void BeamTick()
 	{
 		// alpha = sin(GetAge() * 60) + 0.5;
+		aimAtCrosshair();
 	}
  }
  
