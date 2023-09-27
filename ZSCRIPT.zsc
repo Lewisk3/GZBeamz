@@ -1,6 +1,5 @@
- version "4.5"
+ version "4.10"
  
- #include "ZScript/laser_math.zsc"
  #include "ZScript/laser_base.zsc"
  
  class PulseLaser : BEAMZ_LaserBeam
@@ -50,6 +49,4 @@
 			beam.trackingPos = !beam.trackingPos;
 	}
  }
- 
- 
  
