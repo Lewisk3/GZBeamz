@@ -115,11 +115,11 @@ class BEAMZ_LaserBeam : Actor
 		if(!enabled || !source) 
 		{
 			ontics = 0;
-			renderRequired = -1;
+			bInvisible = true;
 			return;
 		}
 		ontics++;
-		renderRequired = (ontics < 3)? -1 : 0;
+		bInvisible = ontics < 3;
 		if(shade) SetShade(shade);
 		
 		if( ontics == 2 || (ontics >= 2 && continuousHit) )
